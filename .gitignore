@@ -1,9 +1,19 @@
-# Ignore the build and lib dirs
- build 
-lib/* 
+# Ignore executables and build files
+bin/
+build/
+*.o
+*.out
 
-# Ignore any executables 
-bin/*
-
-# Ignore temporary files
+# Ignore temporary and editor files
 *.swp
+
+# Ignore compressed archives
+*.zip
+*.rar
+*.tar.gz
+
+# Ignore large auto-generated outputs
+Linux_Week5_Miniproject1/compressed_files/
+Linux_Week5_Miniproject1/missing_list
+Linux_Week5_Miniproject1/wrong_list
+
