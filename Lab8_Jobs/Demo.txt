@@ -1,0 +1,85 @@
+user@VirtualBox:~$ cd Linux2025Fall/Lab8_Jobs
+
+# 啟動三個 vim 在背景
+vim a.txt &
+vim b.txt &
+vim c.txt &
+[1] 2905
+[2] 2906
+[3] 2907
+
+# 檢查背景工作
+jobs
+[1]   Stopped                 vim a.txt
+[2]+  Stopped                 vim b.txt
+[3]-  Stopped                 vim c.txt
+
+# 將 a.txt 回到前景並結束
+fg %1
+vim a.txt
+
+# 再次檢查 jobs
+jobs
+[2]+  Stopped                 vim b.txt
+[3]   Stopped                 vim c.txt
+
+# 觀察當前 bash 的 process tree
+echo $$
+2402
+pstree -p 2402
+bash(2402)─┬─pstree(2915)
+           ├─vim(2906)
+           └─vim(2907)
+
+# 結束 vim b.txt
+kill -9 2906
+
+# 檢查 jobs 與 process tree
+jobs
+[2]+  Killed                  vim b.txt
+[3]   Stopped                 vim c.txt
+pstree -p 2402
+bash(2402)─┬─pstree(2926)
+           └─vim(2907)
+
+# 將 vim c.txt 回到前景並結束
+fg %3
+vim c.txt
+
+# 確認所有 vim 結束
+jobs
+pstree -p 2402
+bash(2402)───pstree(2929)
+
+# 開新 vim 進行 renice 測試
+vim d.txt &
+[1] 2932
+
+# 查看目前 priority
+ps -l
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000    2402    2376  0  80   0 -  3073 do_wai pts/0    00:00:00 bash
+0 T  1000    2932    2402  0  80   0 - 16203 do_sig pts/0    00:00:00 vim
+0 R  1000    2934    2402  0  80   0 -  3325 -      pts/0    00:00:00 ps
+
+# 將 vim d.txt 的 nice 值 +10
+renice +10 -p 2932
+2932 (process ID) old priority 0, new priority 10
+
+# 再次查看 priority
+ps -l
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000    2402    2376  0  80   0 -  3073 do_wai pts/0    00:00:00 bash
+0 T  1000    2932    2402  0  90  10 - 16203 do_sig pts/0    00:00:00 vim
+0 R  1000    2939    2402  0  80   0 -  3325 -      pts/0    00:00:00 ps
+
+# 結束 vim d.txt
+kill -9 2932
+[1]+  Killed                  vim d.txt
+
+# 最後確認
+ps -l
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000    2402    2376  0  80   0 -  3073 do_wai pts/0    00:00:00 bash
+0 R  1000    3051    2402  0  80   0 -  3325 -      pts/0    00:00:00 ps
+
