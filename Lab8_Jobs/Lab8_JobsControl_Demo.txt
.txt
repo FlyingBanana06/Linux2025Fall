@@ -1,3 +1,7 @@
+# Demo of Linux Process Management Lab (Jobs Control)
+# Commands: jobs, fg, kill, pstree, renice, ps
+# All identifiers and usernames anonymized for public sharing
+
 user@VirtualBox:~$ cd Linux2025Fall/Lab8_Jobs
 
 # 啟動三個 vim 在背景
